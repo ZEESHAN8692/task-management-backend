@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'user'],
       default: 'user',
       required: true
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6
     }
   },
   { timestamps: true } // createdAt & updatedAt अपने आप बनेंगे
