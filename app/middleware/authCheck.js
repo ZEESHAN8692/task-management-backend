@@ -2,19 +2,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 // import roles from "../middleware/Roll/roles.js";
 
-export const hsahePassword = (password) => {
-  try {
-    const salt = 10;
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    return hashedPassword;
-  } catch (err) {
-    console.log(err);
-  }
-};
-export const comparePassword = (password, hashedPassword) => {
-  return bcrypt.compare(password, hashedPassword);
-};
-
 export const AuthCheck = (req, res, next) => {
   const token =
     req?.body?.token || req?.query?.token || req?.headers["x-access-token"];

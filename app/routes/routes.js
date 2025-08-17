@@ -2,6 +2,7 @@ import  express from 'express';
 import userController from '../controller/userController.js';
 import upload from '../middleware/uploadImage.js';
 import adminPanelController from '../controller/adminPanelController.js';
+import { AuthCheck } from '../middleware/authCheck.js';
 
 const  router = express.Router();
 
@@ -9,29 +10,29 @@ router.post("/register", upload.single("image") ,userController.register);
 router.post("/login", userController.login);
 
 // Project routes
-router.post("create-project", projectController.createProject);
-router.get("/projects", projectController.getAllProjects);
-router.get("/single-project/:id", projectController.getSingleProject);
-router.put("/update-project/:id", projectController.updateProject);
-router.delete("/delete-project/:id", projectController.deleteProject);
+router.post("create-project", AuthCheck,projectController.createProject);
+router.get("/projects",AuthCheck, projectController.getAllProjects);
+router.get("/single-project/:id",AuthCheck, projectController.getSingleProject);
+router.put("/update-project/:id",AuthCheck, projectController.updateProject);
+router.delete("/delete-project/:id",AuthCheck, projectController.deleteProject);
+
 
 // Task routes
-router.post("/projects/:projectId/tasks", taskController.createTask);
-router.get("/projects/:projectId/tasks", taskController.getTasksByProject);
-router.get("/tasks/:id", taskController.getTaskById);
-router.put("/tasks/:id", taskController.updateTask);
-router.delete("/tasks/:id", taskController.deleteTask);
-router.patch("/tasks/:id/move", taskController.moveTask);
-
+router.post("/projects/:projectId/tasks",AuthCheck, taskController.createTask);
+router.get("/projects/:projectId/tasks",AuthCheck, taskController.getTasksByProject);
+router.get("/tasks/:id",AuthCheck, taskController.getTaskById);
+router.put("/tasks/:id",AuthCheck, taskController.updateTask);
+router.delete("/tasks/:id",AuthCheck, taskController.deleteTask);
+router.patch("/tasks/:id/move",AuthCheck, taskController.moveTask);
 
 
 
 // Admin routes
-router.post("/admin/create-user", upload.single("image"), adminPanelController.createUser);
-router.put("/admin/users/:id", upload.single("image"), adminPanelController.updateUser);
-router.get("/admin/users",adminPanelController.getAllUsers);
-router.get("/admin/users/:id", adminPanelController.getSingleUser);
-router.delete("/admin/users/:id", adminPanelController.deleteUser);
+router.post("/admin/create-user",AuthCheck, upload.single("image"), adminPanelController.createUser);
+router.put("/admin/users/:id",AuthCheck, upload.single("image"), adminPanelController.updateUser);
+router.get("/admin/users",AuthCheck,adminPanelController.getAllUsers);
+router.get("/admin/users/:id",AuthCheck, adminPanelController.getSingleUser);
+router.delete("/admin/users/:id", AuthCheck,adminPanelController.deleteUser);
 
 
 // ---------------- COLUMN MANAGEMENT ----------------
@@ -56,7 +57,7 @@ export const createColumn = async (req, res) => {
   }
 };
 
-// @desc Update column
+
 // @route PUT /admin/columns/:id
 export const updateColumn = async (req, res) => {
   try {
@@ -75,7 +76,7 @@ export const updateColumn = async (req, res) => {
   }
 };
 
-// @desc Delete column
+
 // @route DELETE /admin/columns/:id
 export const deleteColumn = async (req, res) => {
   try {
