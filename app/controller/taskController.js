@@ -20,7 +20,7 @@ class TaskController {
         }
     };
 
-    async getTasksByProject(req, req) {
+    async getTasksByProject(req, res) {
         try {
             const tasks = await Task.find({ projectId: req.params.projectId })
                 .populate("assignedTo", "name email")

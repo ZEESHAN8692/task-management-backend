@@ -11,6 +11,8 @@ const app = express();
 Database();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 // make static folder /uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
