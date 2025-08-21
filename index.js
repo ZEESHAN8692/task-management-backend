@@ -2,6 +2,7 @@ import express from 'express';
 import Database from './app/config/Database.js';
 import AuthenticationRoutes from './app/routes/routes.js';
 import path from 'path';
+import cors from 'cors';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -9,7 +10,7 @@ const app = express();
 
 // Database connection
 Database();
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

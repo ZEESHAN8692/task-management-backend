@@ -11,6 +11,7 @@ const  router = express.Router();
 
 router.post("/register", upload.single("image") ,userController.register);
 router.post("/login", userController.login);
+router.get("/profile", AuthCheck, userController.getProfile);
 
 // Project routes
 router.post("create-project", AuthCheck,projectController.createProject);
