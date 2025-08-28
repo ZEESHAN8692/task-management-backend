@@ -28,7 +28,7 @@ class AdminPanelController {
                 phone,
                 password: hashedPassword,
                 roll: roll || 'user',
-                image: req.file ? `/uploads/${req.file.filename}` : null,
+                image: req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null,
 
             }).save();
 
@@ -61,7 +61,7 @@ class AdminPanelController {
                 if (fs.existsSync(imagePathFull)) {
                     fs.unlinkSync(imagePathFull);
                 }
-                user.image = `/uploads/${req.file.filename}`;
+                user.image = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
             }
 
             await user.save();

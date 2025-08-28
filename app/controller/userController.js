@@ -27,7 +27,7 @@ class UserController {
         phone,
         password: hashedPassword,
         roll: roll || 'user',
-        image: req.file ? `/uploads/${req.file.filename}` : null,
+        image: req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null,
 
       }).save();
 
