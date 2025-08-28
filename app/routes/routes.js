@@ -14,8 +14,8 @@ router.post("/login", userController.login);
 router.get("/profile", AuthCheck, userController.getProfile);
 
 // Project routes
-router.post("create-project", AuthCheck,projectController.createProject);
-router.get("/projects",AuthCheck, projectController.getAllProjects);
+router.post("/create-project", AuthCheck,projectController.createProject);
+router.get("/projects", AuthCheck, projectController.getAllProjects);
 router.get("/single-project/:id",AuthCheck, projectController.getSingleProject);
 router.put("/update-project/:id",AuthCheck, projectController.updateProject);
 router.delete("/delete-project/:id",AuthCheck, projectController.deleteProject);

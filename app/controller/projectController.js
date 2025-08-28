@@ -8,7 +8,7 @@ class ProjectController {
             const project = new Project({
                 name,
                 description,
-                createdBy: req.user._id, // from authMiddleware
+                createdBy: req.user.id, // from authMiddleware
                 members: members || []
             });
 
@@ -24,14 +24,14 @@ class ProjectController {
             let projects;
 
             if (req.user.role === "admin") {
-                projects = await Project.find().populate("createdBy", "name email").populate("members", "name email");
+                projects = await Project.find().populate("createdBy", "name email image").populate("members", "name email image");
             } else {
                 projects = await Project.find({
                     $or: [{ createdBy: req.user._id }, { members: req.user._id }]
-                }).populate("createdBy", "name email").populate("members", "name email");
+                }).populate("createdBy", "name email image").populate("members", "name email image");
             }
 
-            res.json(projects);
+            res.json({ status: true , message: "Projects fetched", data:projects });
         } catch (error) {
             res.status(500).json({ message: "Error fetching projects", error: error.message });
         }
@@ -40,8 +40,8 @@ class ProjectController {
     async getSingleProject(req, res) {
         try {
             const project = await Project.findById(req.params.id)
-                .populate("createdBy", "name email")
-                .populate("members", "name email");
+                .populate("createdBy", "name email image")
+                .populate("members", "name email image");
 
             if (!project) return res.status(404).json({ message: "Project not found" });
 
