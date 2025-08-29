@@ -19,23 +19,32 @@ class ProjectController {
         }
     };
 
+
     async getAllProjects(req, res) {
         try {
             let projects;
 
+            // Check if the user is an admin or not
             if (req.user.role === "admin") {
-                projects = await Project.find().populate("createdBy", "name email image").populate("members", "name email image");
+                // If the user is an admin, return all projects
+                projects = await Project.find()
+                    .populate("createdBy", "name email image")
+                    .populate("members", "name email image");
             } else {
+                // If the user is not an admin, show only the projects that the user created
                 projects = await Project.find({
-                    $or: [{ createdBy: req.user._id }, { members: req.user._id }]
-                }).populate("createdBy", "name email image").populate("members", "name email image");
+                    createdBy: req.user.id, // Filter by createdBy field matching the user's ID
+                })
+                    .populate("createdBy", "name email image")
+                    .populate("members", "name email image");
             }
 
-            res.json({ status: true , message: "Projects fetched", data:projects });
+            res.json({ status: true, message: "Projects fetched", data: projects });
         } catch (error) {
             res.status(500).json({ message: "Error fetching projects", error: error.message });
         }
-    };
+    }
+
 
     async getSingleProject(req, res) {
         try {
@@ -60,9 +69,9 @@ class ProjectController {
             if (!project) return res.status(404).json({ message: "Project not found" });
 
             // only creator or admin can update
-            if (String(project.createdBy) !== String(req.user._id) && req.user.role !== "admin") {
-                return res.status(403).json({ message: "Not authorized to update this project" });
-            }
+            // if (String(project.createdBy) !== String(req.user._id) && req.user.role !== "admin") {
+            //     return res.status(403).json({ message: "Not authorized to update this project" });
+            // }
 
             project.name = name || project.name;
             project.description = description || project.description;
@@ -93,7 +102,7 @@ class ProjectController {
         }
     };
 
-    
+
 
 }
 
