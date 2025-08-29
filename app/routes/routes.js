@@ -12,10 +12,12 @@ const  router = express.Router();
 router.post("/register", upload.single("image") ,userController.register);
 router.post("/login", userController.login);
 router.get("/profile", AuthCheck, userController.getProfile);
+router.get("/members", AuthCheck, userController.getAllUsersForMembers);
 
 // Project routes
 router.post("/create-project", AuthCheck,projectController.createProject);
 router.get("/projects", AuthCheck, projectController.getAllProjects);
+router.get("/projects/:id/members",AuthCheck, projectController.getProjectMembers);
 router.get("/single-project/:id",AuthCheck, projectController.getSingleProject);
 router.put("/update-project/:id",AuthCheck, projectController.updateProject);
 router.delete("/delete-project/:id",AuthCheck, projectController.deleteProject);

@@ -3,11 +3,12 @@ import Task from '../model/taskModel.js';
 class TaskController {
     async createTask(req, res) {
         try {
-            const { title, description, dueDate, assignedTo } = req.body;
+            const { title, description , status, dueDate, assignedTo } = req.body;
 
             const task = new Task({
                 title,
                 description,
+                status,
                 dueDate,
                 assignedTo,
                 projectId: req.params.projectId
@@ -24,9 +25,10 @@ class TaskController {
         try {
             const tasks = await Task.find({ projectId: req.params.projectId })
                 .populate("assignedTo", "name email")
+                .populate("projectId", "name")
                 .sort({ createdAt: -1 });
 
-            res.json(tasks);
+            res.json({sataus: true, message: "Tasks fetched", data: tasks});
         } catch (error) {
             res.status(500).json({ message: "Error fetching tasks", error: error.message });
         }

@@ -69,6 +69,18 @@ class UserController {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+
+  getAllUsersForMembers = async (req, res) => {
+    try {
+      const users = await User.aggregate([
+        { $match: { role: 'user' } },
+        { $project: { name: 1, email: 1, image: 1 } },
+      ]);
+      res.status(200).json({ message: "Users fetched successfully", data: users });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
 }
 
 export default new UserController();
