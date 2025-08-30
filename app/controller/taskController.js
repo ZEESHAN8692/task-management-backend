@@ -24,7 +24,7 @@ class TaskController {
     async getTasksByProject(req, res) {
         try {
             const tasks = await Task.find({ projectId: req.params.projectId })
-                .populate("assignedTo", "name email")
+                .populate("assignedTo", "name email image")
                 .populate("projectId", "name")
                 .sort({ createdAt: -1 });
 
