@@ -13,7 +13,8 @@ class TaskController {
                 status,
                 dueDate,
                 assignedTo,
-                projectId: req.params.projectId
+                projectId: req.params.projectId,
+                createBy: req.user.id
             });
 
             await task.save();
@@ -44,6 +45,15 @@ class TaskController {
             res.json({ message: "Tasks count fetched", tasks });
         } catch (error) {
             res.status(500).json({ message: "Error fetching tasks count", error: error.message });
+        }
+    }
+
+    async getTaskAllWithoutProject(req, res) {
+        try {
+            const tasks = await Task.find({ createBy: req.user.id })
+            res.json({ message: "Tasks fetched", data:tasks });
+        } catch (error) {
+            res.status(500).json({ message: "Error fetching tasks", error: error.message });
         }
     }
 
