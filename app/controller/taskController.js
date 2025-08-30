@@ -1,3 +1,5 @@
+
+
 import Task from '../model/taskModel.js';
 
 class TaskController {
@@ -33,6 +35,29 @@ class TaskController {
             res.status(500).json({ message: "Error fetching tasks", error: error.message });
         }
     };
+    
+    async getTasksCountAdmin (req, res) {
+        try {
+            if (req.user.role !== "admin") return res.status(403).json({ message: "Not authorized to get tasks count" });
+
+            const tasks = await Task.find().countDocuments();
+            res.json({ message: "Tasks count fetched", tasks });
+        } catch (error) {
+            res.status(500).json({ message: "Error fetching tasks count", error: error.message });
+        }
+    }
+
+    async getTaskProgress(req, res) {
+        try {
+            const tasks = await Task.find({ projectId: req.params.projectId }).countDocuments();
+            const completedTasks = await Task.find({ projectId: req.params.projectId, status: "Completed" }).countDocuments();
+            const progress = (completedTasks / tasks) * 100;
+            const totalTasks = tasks - completedTasks;
+            res.json({ message: "Task progress fetched", progress , totalTasks });
+        } catch (error) {
+            res.status(500).json({ message: "Error fetching task progress", error: error.message });
+        }
+    }
 
     async getTaskById(req, res) {
         try {
@@ -93,12 +118,6 @@ class TaskController {
     res.status(500).json({ message: "Error moving task", error: error.message });
   }
 };
-
-
-
-
-
-
 
 
 }

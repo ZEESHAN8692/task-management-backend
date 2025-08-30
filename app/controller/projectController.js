@@ -1,4 +1,6 @@
 import Project from '../model/projectModel.js';
+import Task from '../model/taskModel.js';
+
 
 class ProjectController {
     async createProject(req, res) {
@@ -37,7 +39,9 @@ class ProjectController {
                 })
                     .populate("createdBy", "name email image")
                     .populate("members", "name email image");
-            }
+
+                
+            }            
 
             res.json({ status: true, message: "Projects fetched", data: projects });
         } catch (error) {
@@ -104,8 +108,8 @@ class ProjectController {
 
             if (!project) return res.status(404).json({ message: "Project not found" });
 
-            // only creator can delete (admin bhi delete nahi kar sakta)
-            if (String(project.createdBy) !== String(req.user.id)) {
+            // only admin and creator can delete
+            if (req.user.role !== "admin" && String(project.createdBy) !== String(req.user.id)) {
                 return res.status(403).json({ message: "Not authorized to delete this project" });
             }
 
@@ -115,7 +119,6 @@ class ProjectController {
             res.status(500).json({ message: "Error deleting project", error: error.message });
         }
     };
-
 
 
 

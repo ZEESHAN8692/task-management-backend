@@ -26,6 +26,8 @@ router.delete("/delete-project/:id",AuthCheck, projectController.deleteProject);
 // Task routes
 router.post("/projects/:projectId/tasks",AuthCheck, taskController.createTask);
 router.get("/projects/:projectId/tasks",AuthCheck, taskController.getTasksByProject);
+router.get("/tasks/progress/:projectId",AuthCheck, taskController.getTaskProgress);
+router.get("/admin/tasks",AuthCheck, taskController.getTasksCountAdmin);
 router.get("/tasks/:id",AuthCheck, taskController.getTaskById);
 router.put("/tasks/:id",AuthCheck, taskController.updateTask);
 router.delete("/tasks/:id",AuthCheck, taskController.deleteTask);
