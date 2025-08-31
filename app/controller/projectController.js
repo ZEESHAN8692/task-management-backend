@@ -34,14 +34,19 @@ class ProjectController {
                     .populate("members", "name email image");
             } else {
                 // If the user is not an admin, show only the projects that the user created
-                projects = await Project.find({
-                    createdBy: req.user.id, // Filter by createdBy field matching the user's ID
-                })
+                projects = await Project.find(
+                    {
+                        $or: [
+                            { createdBy: req.user.id },
+                            { members: req.user.id }
+                        ]
+                    }
+                )
                     .populate("createdBy", "name email image")
                     .populate("members", "name email image");
 
-                
-            }            
+
+            }
 
             res.json({ status: true, message: "Projects fetched", data: projects });
         } catch (error) {
@@ -49,7 +54,7 @@ class ProjectController {
         }
     }
 
-    
+
     async getProjectMembers(req, res) {
         try {
             const project = await Project.findById(req.params.id)

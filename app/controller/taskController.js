@@ -60,62 +60,19 @@ class TaskController {
     }
 
 
-    // Controller
     // async getProjectsWithTasks(req, res) {
     //     try {
-    //         // Pehle current user ke sare projects nikal lo
-    //         const projects = await Project.find({ createdBy: req.user.id });
+    //         const userId = new mongoose.Types.ObjectId();
 
-    //         // Project wise tasks count nikalne ke liye aggregation
-    //         const tasks = await Task.aggregate([
-    //             {
-    //                 $match: { createdBy: new mongoose.Types.ObjectId(req.user.id) }
-    //             },
-    //             {
-    //                 $group: {
-    //                     _id: "$projectId",
-    //                     total: { $sum: 1 },
-    //                     completed: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] } },
-    //                     inProgress: { $sum: { $cond: [{ $eq: ["$status", "inProgress"] }, 1, 0] } },
-    //                     toDo: { $sum: { $cond: [{ $eq: ["$status", "toDo"] }, 1, 0] } }
-    //                 }
-    //             }
-    //         ]);
-
-    //         // project + task details ko merge kar do
-    //         const result = projects.map(project => {
-    //             const taskStat = tasks.find(t => t._id.toString() === project._id.toString());
-    //             return {
-    //                 projectId: project._id,
-    //                 name: project.name,
-    //                 totalTasks: taskStat ? taskStat.total : 0,
-    //                 completed: taskStat ? taskStat.completed : 0,
-    //                 inProgress: taskStat ? taskStat.inProgress : 0,
-    //                 toDo: taskStat ? taskStat.toDo : 0,
-    //                 progress: taskStat ? ((taskStat.completed / taskStat.total) * 100).toFixed(2) + "%" : "0%"
-    //             };
-    //         });
-
-    //         res.json({ message: "Projects with tasks fetched", data: result });
-    //     } catch (error) {
-    //         res.status(500).json({ message: "Error fetching project tasks", error: error.message });
-    //     }
-    // }
-    //     async  getProjectsWithTasks(req, res) {
-    //     try {
-    //         // Current user ke sare projects
-    //         const projects = await Project.find({ createdBy: req.user.id });
-    //         console.log("📌 Projects:", projects);
-
-    //         // Project wise tasks count (aggregation)
-    //         const tasks = await Task.aggregate([
+    //         // Step 1: Aggregate tasks where user is involved
+    //         const taskStats = await Task.aggregate([
     //             {
     //                 $match: {
-    //                     // Agar Task schema me createdBy ObjectId hai to ObjectId use karo
     //                     $or: [
-    //                         { createdBy: req.user.id }, // string case
-    //                         { createdBy: new mongoose.Types.ObjectId(req.user.id) } // ObjectId case
-    //                     ]
+    //                         { assignedTo: userId },
+    //                         { createBy: userId }
+    //                     ],
+    //                     projectId: { $exists: true }
     //                 }
     //             },
     //             {
@@ -123,53 +80,71 @@ class TaskController {
     //                     _id: "$projectId",
     //                     total: { $sum: 1 },
     //                     completed: {
-    //                         $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] }
+    //                         $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] }
     //                     },
     //                     inProgress: {
-    //                         $sum: { $cond: [{ $eq: ["$status", "inProgress"] }, 1, 0] }
+    //                         $sum: { $cond: [{ $eq: ["$status", "In Progress"] }, 1, 0] }
     //                     },
-    //                     toDo: { $sum: { $cond: [{ $eq: ["$status", "toDo"] }, 1, 0] } }
+    //                     toDo: {
+    //                         $sum: { $cond: [{ $eq: ["$status", "To-Do"] }, 1, 0] }
+    //                     }
     //                 }
     //             }
     //         ]);
 
-    //         console.log("📌 Aggregated Tasks:", tasks);
+    //         // Step 2: Get ALL projects created by user
+    //         const projects = await Project.find({ createdBy: userId });
 
-    //         // Merge projects + task stats
+    //         // Step 3: Merge stats with all projects
     //         const result = projects.map(project => {
-    //             // compare project._id aur aggregation ke _id
-    //             const taskStat = tasks.find(
+    //             const stat = taskStats.find(
     //                 t => t._id.toString() === project._id.toString()
     //             );
+
+    //             const progress = stat && stat.total > 0
+    //                 ? ((stat.completed / stat.total) * 100).toFixed(2) + "%"
+    //                 : "0%";
 
     //             return {
     //                 projectId: project._id,
     //                 name: project.name,
-    //                 totalTasks: taskStat ? taskStat.total : 0,
-    //                 completed: taskStat ? taskStat.completed : 0,
-    //                 inProgress: taskStat ? taskStat.inProgress : 0,
-    //                 toDo: taskStat ? taskStat.toDo : 0,
-    //                 progress: taskStat
-    //                     ? ((taskStat.completed / taskStat.total) * 100).toFixed(2) + "%"
-    //                     : "0%"
+    //                 description: project.description,
+    //                 totalTasks: stat ? stat.total : 0,
+    //                 completed: stat ? stat.completed : 0,
+    //                 inProgress: stat ? stat.inProgress : 0,
+    //                 toDo: stat ? stat.toDo : 0,
+    //                 progress
     //             };
     //         });
 
-    //         res.json({ message: "Projects with tasks fetched", data: result });
+    //         res.json({
+    //             message: "All projects with tasks (0 if no tasks)",
+    //             data: result
+    //         });
     //     } catch (error) {
-    //         console.error("❌ Error in getProjectsWithTasks:", error);
-    //         res
-    //             .status(500)
-    //             .json({ message: "Error fetching project tasks", error: error.message });
+    //         console.error("❌ Error in getUserProjectsWithTasks:", error);
+    //         res.status(500).json({
+    //             message: "Error fetching project tasks",
+    //             error: error.message
+    //         });
     //     }
     // }
-
 
     async getProjectsWithTasks(req, res) {
         try {
             const userId = new mongoose.Types.ObjectId(req.user.id);
 
-            // Step 1: Aggregate tasks where user is involved
+            let projectFilter = {};
+            if (req.user.role !== "admin") {
+                projectFilter = {
+                    $or: [
+                        { createdBy: userId },
+                        { members: userId }
+                    ]
+                };
+            }
+
+            // Step 1: Aggregate tasks related to this user
             const taskStats = await Task.aggregate([
                 {
                     $match: {
@@ -197,8 +172,10 @@ class TaskController {
                 }
             ]);
 
-            // Step 2: Get ALL projects created by user
-            const projects = await Project.find({ createdBy: userId });
+            // Step 2: Get projects (admin → all, user → createdBy or member)
+            const projects = await Project.find(projectFilter)
+                .populate("createdBy", "name email image")
+                .populate("members", "name email image");
 
             // Step 3: Merge stats with all projects
             const result = projects.map(project => {
@@ -206,14 +183,17 @@ class TaskController {
                     t => t._id.toString() === project._id.toString()
                 );
 
-                const progress = stat && stat.total > 0
-                    ? ((stat.completed / stat.total) * 100).toFixed(2) + "%"
-                    : "0%";
+                const progress =
+                    stat && stat.total > 0
+                        ? ((stat.completed / stat.total) * 100).toFixed(2) + "%"
+                        : "0%";
 
                 return {
                     projectId: project._id,
                     name: project.name,
                     description: project.description,
+                    createdBy: project.createdBy,
+                    members: project.members,
                     totalTasks: stat ? stat.total : 0,
                     completed: stat ? stat.completed : 0,
                     inProgress: stat ? stat.inProgress : 0,
@@ -223,17 +203,20 @@ class TaskController {
             });
 
             res.json({
-                message: "All projects with tasks (0 if no tasks)",
+                status: true,
+                message: "Projects with tasks fetched successfully",
                 data: result
             });
         } catch (error) {
-            console.error("❌ Error in getUserProjectsWithTasks:", error);
+            console.error("❌ Error in getProjectsWithTasks:", error);
             res.status(500).json({
+                status: false,
                 message: "Error fetching project tasks",
                 error: error.message
             });
         }
     }
+
 
 
 
