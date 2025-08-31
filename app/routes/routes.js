@@ -28,6 +28,7 @@ router.post("/projects/:projectId/tasks",AuthCheck, taskController.createTask);
 router.get("/projects/:projectId/tasks",AuthCheck, taskController.getTasksByProject);
 router.get("/tasks/progress/:projectId",AuthCheck, taskController.getTaskProgress);
 router.get("/tasks/create-by",AuthCheck, taskController.getTaskAllWithoutProject);
+router.get("/tasks/projects-progress",AuthCheck, taskController.getProjectsWithTasks);
 router.get("/admin/tasks",AuthCheck, taskController.getTasksCountAdmin);
 router.get("/tasks/:id",AuthCheck, taskController.getTaskById);
 router.put("/tasks/:id",AuthCheck, taskController.updateTask);
