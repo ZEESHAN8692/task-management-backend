@@ -2,7 +2,7 @@ import  express from 'express';
 import userController from '../controller/userController.js';
 import upload from '../middleware/uploadImage.js';
 import adminPanelController from '../controller/adminPanelController.js';
-import { AuthCheck } from '../middleware/authCheck.js';
+import { AuthCheck , adminCheck} from '../middleware/authCheck.js';
 import projectController from '../controller/projectController.js';
 import taskController from '../controller/taskController.js';
 import columnsControllers from '../controller/columnsControllers.js';
@@ -29,7 +29,7 @@ router.get("/projects/:projectId/tasks",AuthCheck, taskController.getTasksByProj
 router.get("/tasks/progress/:projectId",AuthCheck, taskController.getTaskProgress);
 router.get("/tasks/create-by",AuthCheck, taskController.getTaskAllWithoutProject);
 router.get("/tasks/projects-progress",AuthCheck, taskController.getProjectsWithTasks);
-router.get("/admin/tasks",AuthCheck, taskController.getTasksCountAdmin);
+router.get("/admin/tasks",AuthCheck, adminCheck, taskController.getTasksCountAdmin);
 router.get("/tasks/:id",AuthCheck, taskController.getTaskById);
 router.put("/tasks/:id",AuthCheck, taskController.updateTask);
 router.delete("/tasks/:id",AuthCheck, taskController.deleteTask);
@@ -38,19 +38,19 @@ router.patch("/tasks/:id/move",AuthCheck, taskController.moveTask);
 
 
 // Admin routes
-router.post("/admin/create-user",AuthCheck, upload.single("image"), adminPanelController.createUser);
-router.put("/admin/users/:id",AuthCheck, upload.single("image"), adminPanelController.updateUser);
-router.get("/admin/users",AuthCheck,adminPanelController.getAllUsers);
-router.get("/admin/users/:id",AuthCheck, adminPanelController.getSingleUser);
-router.delete("/admin/users/:id", AuthCheck,adminPanelController.deleteUser);
+router.post("/admin/create-user",AuthCheck,adminCheck, upload.single("image"), adminPanelController.createUser);
+router.put("/admin/users/:id",AuthCheck,adminCheck, upload.single("image"), adminPanelController.updateUser);
+router.get("/admin/users",AuthCheck,adminCheck,adminPanelController.getAllUsers);
+router.get("/admin/users/:id",AuthCheck,adminCheck, adminPanelController.getSingleUser);
+router.delete("/admin/users/:id", AuthCheck,adminCheck,adminPanelController.deleteUser);
 
 
 // ---------------- COLUMN MANAGEMENT ----------------
 
-router.get("/admin/columns", AuthCheck, columnsControllers.getColumns);
-router.post("/admin/columns", AuthCheck, columnsControllers.createColumn);
-router.put("/admin/columns/:id", AuthCheck, columnsControllers.updateColumn);
-router.delete("/admin/columns/:id", AuthCheck, columnsControllers.deleteColumn);
+router.get("/admin/columns", AuthCheck,adminCheck, columnsControllers.getColumns);
+router.post("/admin/columns", AuthCheck,adminCheck, columnsControllers.createColumn);
+router.put("/admin/columns/:id", AuthCheck,adminCheck, columnsControllers.updateColumn);
+router.delete("/admin/columns/:id", AuthCheck,adminCheck, columnsControllers.deleteColumn);
 
 
 
