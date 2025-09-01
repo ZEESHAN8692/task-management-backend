@@ -12,6 +12,7 @@ const  router = express.Router();
 router.post("/register", upload.single("image") ,userController.register);
 router.post("/login", userController.login);
 router.get("/profile", AuthCheck, userController.getProfile);
+router.post("/logout", AuthCheck, userController.logout);
 router.get("/members", AuthCheck, userController.getAllUsersForMembers);
 
 // Project routes

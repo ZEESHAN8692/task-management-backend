@@ -2,8 +2,10 @@
 import User from '../model/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+dotenv.config();
 class UserController {
   async register(req, res) {
     try {
@@ -40,7 +42,7 @@ class UserController {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
-  async login(req, res) { 
+  async login(req, res) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ email });
@@ -51,8 +53,21 @@ class UserController {
       if (!isPasswordValid) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
-      const token = jwt.sign({ id: user._id , role: user.role , email: user.email , name: user.name }, process.env.JWT_ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1d' });
-      res.status(200).json({ message: "Login successfully", token, data:user });
+      const token = jwt.sign({ id: user._id, role: user.role, email: user.email, name: user.name }, process.env.JWT_ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1d' });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 86400000
+      });
+
+      res.cookie("role", user.role, {
+        httpOnly: false,
+        sameSite: "strict",
+        maxAge: 86400000,
+      });
+
+      res.status(200).json({ message: "Login successfully", data: user });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -65,6 +80,26 @@ class UserController {
         return res.status(404).json({ message: "User not found" });
       }
       res.status(200).json({ message: "Profile fetched successfully", data: user });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+  async logout(req, res) {
+    try {
+        res.clearCookie("token", {
+      httpOnly: false,
+      secure: false,
+      sameSite: "strict",
+      path: "/login",
+    });
+
+    res.clearCookie("role", {
+      sameSite: "strict",
+      secure: false,
+      httpOnly: false,
+      path: "/login",
+    });
+      res.status(200).json({ message: "Logout successfully" });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }

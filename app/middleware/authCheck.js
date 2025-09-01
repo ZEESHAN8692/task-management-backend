@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 // import roles from "../middleware/Roll/roles.js";
 
 export const AuthCheck = (req, res, next) => {
-  const token =
-    req?.body?.token || req?.query?.token || req?.headers["x-access-token"];
+  const token = req.cookies.token;
+    // req?.body?.token || req?.query?.token || req?.headers["x-access-token"];
   if (!token) {
     return res.status(400).json({
       message: "Token is required for access this page",
@@ -27,8 +27,8 @@ export const AuthCheck = (req, res, next) => {
 };
 
 export const adminCheck = (req, res, next) => {
-  const token =
-    req?.body?.token || req?.query?.token || req?.headers["x-access-token"];
+  const token = req.cookies.token;
+    // req?.body?.token || req?.query?.token || req?.headers["x-access-token"];
   if (!token) {
     return res.status(400).json({
       message: "Token is required for access this page",

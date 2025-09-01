@@ -3,6 +3,7 @@ import Database from './app/config/Database.js';
 import AuthenticationRoutes from './app/routes/routes.js';
 import path from 'path';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -10,7 +11,13 @@ const app = express();
 
 // Database connection
 Database();
-app.use(cors());
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+app.use(cookieParser(process.env.JWT_ACCESS_TOKEN_SECRET_KEY));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
